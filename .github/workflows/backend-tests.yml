@@ -48,10 +48,3 @@ jobs:
         pytest tests/ -v --tb=short --color=yes
       env:
         PYTHONPATH: ${{ github.workspace }}/backend
-
-    - name: Generate test coverage report (optional)
-      if: success()
-      run: |
-        pip install pytest-cov
-        pytest tests/ --cov=app --cov-report=term-missing
-      continue-on-error: true
