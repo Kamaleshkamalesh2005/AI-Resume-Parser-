@@ -54,7 +54,7 @@ class MatchHistory(db.Model):  # type: ignore[name-defined]
     created_at: Optional[datetime.datetime] = db.Column(
         db.DateTime,
         nullable=True,
-        default=datetime.datetime.utcnow,
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
 
     def __repr__(self) -> str:

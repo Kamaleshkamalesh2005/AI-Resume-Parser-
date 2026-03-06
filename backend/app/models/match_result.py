@@ -8,7 +8,7 @@ from the resume-to-job-description scoring pipeline.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 def _grade(score: float) -> str:

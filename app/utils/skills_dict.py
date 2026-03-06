@@ -3,6 +3,8 @@ Production-Grade Skills Dictionary
 Comprehensive list of technical skills for resume matching
 """
 
+import re
+
 SKILLS_DICT = {
     # Python & Web Frameworks
     'Python': ['python', 'py'],
@@ -140,7 +142,6 @@ def extract_skills_from_text(text):
     # Match tokens against skill lookup
     for token, skill_name in SKILL_LOOKUP.items():
         # Use word boundaries to avoid partial matches
-        import re
         pattern = r'\b' + re.escape(token) + r'\b'
         if re.search(pattern, text_lower):
             found_skills.add(skill_name)
