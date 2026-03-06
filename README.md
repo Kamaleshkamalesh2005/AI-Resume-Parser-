@@ -506,5 +506,6 @@ For issues, questions, or suggestions:
 
 Last Updated: 2024
 Version: 1.0.0
-#   A I - R e s u m e - P a r s e r  
+#   A I - R e s u m e - P a r s e r 
+ 
  
