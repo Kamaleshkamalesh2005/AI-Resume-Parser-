@@ -73,6 +73,9 @@ This project provides an AI-powered pipeline to:
 
 ## Project Workflow (How It Works)
 
+<img width="1901" height="910" alt="Screenshot 2026-03-06 142257" src="https://github.com/user-attachments/assets/35078ce8-9c8c-4435-9bc8-9273cdaa4c69" />
+<img width="1874" height="904" alt="Screenshot 2026-03-06 142321" src="https://github.com/user-attachments/assets/89747018-eab5-4741-8ce0-1eab61a51114" />
+
 ### 1) Input
 - User uploads a resume file via:
   - API endpoint **or**
@@ -209,4 +212,5 @@ Example endpoints (replace with real ones):
 
 ## License
 {MIT / Apache-2.0 / None}
+
 
