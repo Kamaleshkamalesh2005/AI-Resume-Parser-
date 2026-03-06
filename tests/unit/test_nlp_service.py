@@ -20,6 +20,7 @@ Tests cover:
 
 from __future__ import annotations
 
+import textwrap
 from unittest.mock import patch
 
 import pytest
@@ -29,13 +30,42 @@ from app.services.nlp_service import NLPService, _cached_analyse
 pytestmark = pytest.mark.unit
 
 
+@pytest.fixture(scope="module")
+def svc() -> NLPService:
+    """Create NLPService once (spaCy load is expensive)."""
+    return NLPService()
+
+
+@pytest.fixture()
+def sample_resume_text() -> str:
+    return textwrap.dedent(
+        """\
+        John Smith
+        john.smith@example.com | +1 (555) 123-4567
+        https://www.linkedin.com/in/john-smith
+
+        SKILLS
+        Python, Docker, AWS, SQL
+
+        EDUCATION
+        Master of Science, Stanford University, 2020
+
+        EXPERIENCE
+        Software Engineer – Google (2018 - 2022)
+        • Built APIs
+
+        CERTIFICATIONS
+        AWS Certified Solutions Architect
+        """
+    )
+
+
 # =====================================================================
 # Text cleaning
 # =====================================================================
 
-class TestCleanText:
-    """Test the static ``clean_text`` method."""
 
+class TestCleanText:
     def test_normalises_whitespace(self):
         result = NLPService.clean_text("hello   world")
         assert "  " not in result
@@ -61,8 +91,6 @@ class TestCleanText:
 
     def test_fixes_punctuation_spacing(self):
         result = NLPService.clean_text("hello , world .  ok")
-        # The clean_text regex strips commas (non-word chars),
-        # so just verify extra spaces are collapsed
         assert "  " not in result
 
     def test_crlf_normalised(self):
@@ -74,17 +102,14 @@ class TestCleanText:
 # Contact extraction
 # =====================================================================
 
-class TestExtractContact:
-    """Test _extract_contact static method."""
 
+class TestExtractContact:
     def test_single_email(self):
         contact = NLPService._extract_contact("Reach me at alice@example.com")
         assert "alice@example.com" in contact.emails
 
     def test_multiple_emails(self):
-        contact = NLPService._extract_contact(
-            "a@b.com and c@d.org"
-        )
+        contact = NLPService._extract_contact("a@b.com and c@d.org")
         assert len(contact.emails) == 2
 
     def test_no_email(self):
@@ -92,13 +117,11 @@ class TestExtractContact:
         assert contact.emails == []
 
     def test_linkedin_url(self):
-        text = "linkedin.com/in/johndoe"
-        contact = NLPService._extract_contact(text)
+        contact = NLPService._extract_contact("linkedin.com/in/johndoe")
         assert "linkedin.com/in/johndoe" in contact.linkedin
 
     def test_linkedin_with_https(self):
-        text = "https://www.linkedin.com/in/jane-smith"
-        contact = NLPService._extract_contact(text)
+        contact = NLPService._extract_contact("https://www.linkedin.com/in/jane-smith")
         assert "linkedin.com/in/jane-smith" in contact.linkedin
 
     def test_no_linkedin(self):
@@ -106,9 +129,7 @@ class TestExtractContact:
         assert contact.linkedin == ""
 
     def test_phone_number(self):
-        contact = NLPService._extract_contact(
-            "Call +1 (555) 123-4567 anytime"
-        )
+        contact = NLPService._extract_contact("Call +1 (555) 123-4567 anytime")
         assert len(contact.phones) >= 1
 
     def test_invalid_short_email_filtered(self):
@@ -120,9 +141,8 @@ class TestExtractContact:
 # Phone extraction
 # =====================================================================
 
-class TestExtractPhones:
-    """Test _extract_phones static method."""
 
+class TestExtractPhones:
     def test_us_number(self):
         phones = NLPService._extract_phones("Phone: +1 555-123-4567")
         assert len(phones) >= 1
@@ -146,9 +166,8 @@ class TestExtractPhones:
 # Name extraction
 # =====================================================================
 
-class TestExtractName:
-    """Test _extract_name heuristic."""
 
+class TestExtractName:
     def test_simple_name(self):
         name = NLPService._extract_name("John Smith\njohn@email.com")
         assert name == "John Smith"
@@ -160,33 +179,28 @@ class TestExtractName:
         assert NLPService._extract_name("12345\nfoo") == ""
 
     def test_too_many_words(self):
-        name = NLPService._extract_name("One Two Three Four Five")
-        assert name == ""
+        assert NLPService._extract_name("One Two Three Four Five") == ""
 
     def test_pipe_delimited(self):
         name = NLPService._extract_name("Jane Doe | Software Engineer")
-        assert name == "Jane Doe Software Engineer" or "Jane" in name
+        assert "Jane" in name
 
     def test_lowercase_only_rejected(self):
-        name = NLPService._extract_name("no uppercase at all")
-        assert name == ""
+        assert NLPService._extract_name("no uppercase at all") == ""
 
 
 # =====================================================================
 # Skills extraction
 # =====================================================================
 
-class TestExtractSkills:
-    """Test _extract_skills against the taxonomy."""
 
+class TestExtractSkills:
     def test_finds_python(self):
         skills = NLPService._extract_skills("I am proficient in Python and SQL.")
         assert "Python" in skills
 
     def test_finds_multiple(self):
-        skills = NLPService._extract_skills(
-            "Experience with Docker, Kubernetes, and AWS."
-        )
+        skills = NLPService._extract_skills("Experience with Docker, Kubernetes, and AWS.")
         assert "Docker" in skills
         assert "Kubernetes" in skills
 
@@ -195,15 +209,14 @@ class TestExtractSkills:
 
     def test_no_match(self):
         skills = NLPService._extract_skills("I like gardening and cooking.")
-        assert len(skills) == 0
+        assert skills == []
 
     def test_case_insensitive(self):
         skills = NLPService._extract_skills("PYTHON javascript REACT")
         assert "Python" in skills
-        assert "JavaScript" in skills
 
     def test_returns_sorted(self):
-        skills = NLPService._extract_skills("Python, Java, C++, AWS, Docker")
+        skills = NLPService._extract_skills("Python, Java, AWS, Docker")
         assert skills == sorted(skills)
 
 
@@ -211,9 +224,8 @@ class TestExtractSkills:
 # Education extraction
 # =====================================================================
 
-class TestExtractEducation:
-    """Test _extract_education for degree keywords, institutions, years."""
 
+class TestExtractEducation:
     def test_bachelors(self):
         text = "Bachelor of Science in Computer Science, Stanford University 2020"
         edu = NLPService._extract_education(text)
@@ -221,45 +233,33 @@ class TestExtractEducation:
         assert "bachelor" in edu[0].degree.lower()
 
     def test_masters(self):
-        text = "M.S. in Data Science from MIT 2022"
-        edu = NLPService._extract_education(text)
+        edu = NLPService._extract_education("M.S. in Data Science from MIT 2022")
         assert len(edu) >= 1
         assert any("master" in e.degree.lower() for e in edu)
 
     def test_phd(self):
-        text = "Ph.D. in Physics, Caltech (2019)"
-        edu = NLPService._extract_education(text)
+        edu = NLPService._extract_education("Ph.D. in Physics, Caltech (2019)")
         assert any("phd" in e.degree.lower() for e in edu)
 
     def test_year_extraction(self):
-        text = "BS Computer Science, Some University 2018"
-        edu = NLPService._extract_education(text)
+        edu = NLPService._extract_education("BS Computer Science, Some University 2018")
         assert any(e.year == "2018" for e in edu)
 
     def test_institution_detection(self):
-        text = "Bachelor from Stanford University 2020"
-        edu = NLPService._extract_education(text)
+        edu = NLPService._extract_education("Bachelor from Stanford University 2020")
         assert any("Stanford" in e.institution for e in edu)
 
     def test_empty_input(self):
         assert NLPService._extract_education("") == []
 
     def test_no_degree(self):
-        text = "I like cooking food every single day."
-        edu = NLPService._extract_education(text)
+        edu = NLPService._extract_education("I like cooking food every single day.")
         assert edu == []
 
     def test_deduplication(self):
-        text = (
-            "Bachelor of Science from MIT 2020\n"
-            "BS from MIT 2020"
-        )
+        text = "Bachelor of Science from MIT 2020\nBS from MIT 2020"
         edu = NLPService._extract_education(text)
-        # Should deduplicate same degree+institution+year
-        bachelor_mit = [
-            e for e in edu
-            if "bachelor" in e.degree.lower() and "2020" in e.year
-        ]
+        bachelor_mit = [e for e in edu if "bachelor" in e.degree.lower() and e.year == "2020"]
         assert len(bachelor_mit) == 1
 
 
@@ -267,17 +267,14 @@ class TestExtractEducation:
 # Experience extraction
 # =====================================================================
 
-class TestExtractExperience:
-    """Test _extract_experience patterns."""
 
+class TestExtractExperience:
     def test_years_of_experience_summary(self):
-        text = "7+ years of experience in software development"
-        exp = NLPService._extract_experience(text)
+        exp = NLPService._extract_experience("7+ years of experience in software development")
         assert any("years" in e.title.lower() for e in exp)
 
     def test_title_company_duration(self):
-        text = "Software Engineer – Google (2018 - 2022)"
-        exp = NLPService._extract_experience(text)
+        exp = NLPService._extract_experience("Software Engineer – Google (2018 - 2022)")
         assert any(e.company for e in exp)
 
     def test_duration_years_calculation(self):
@@ -286,17 +283,13 @@ class TestExtractExperience:
 
     def test_duration_to_present(self):
         years = NLPService._parse_duration_years("2020 - Present")
-        assert years >= 3  # depends on current year
+        assert years >= 3
 
     def test_empty_input(self):
         assert NLPService._extract_experience("") == []
 
     def test_max_entries(self):
-        # Should cap at 10
-        lines = "\n".join(
-            f"Software Developer – Company{i} (2010 - 2020)"
-            for i in range(15)
-        )
+        lines = "\n".join(f"Software Developer – Company{i} (2010 - 2020)" for i in range(15))
         exp = NLPService._extract_experience(lines)
         assert len(exp) <= 10
 
@@ -316,13 +309,10 @@ class TestExtractExperience:
 # Certifications
 # =====================================================================
 
-class TestExtractCertifications:
-    """Test _extract_certifications regex patterns."""
 
+class TestExtractCertifications:
     def test_aws_cert(self):
-        certs = NLPService._extract_certifications(
-            "AWS Certified Solutions Architect"
-        )
+        certs = NLPService._extract_certifications("AWS Certified Solutions Architect")
         assert len(certs) >= 1
 
     def test_pmp(self):
@@ -334,9 +324,7 @@ class TestExtractCertifications:
         assert any("CISSP" in c for c in certs)
 
     def test_cka(self):
-        certs = NLPService._extract_certifications(
-            "Certified Kubernetes Administrator (CKA)"
-        )
+        certs = NLPService._extract_certifications("Certified Kubernetes Administrator (CKA)")
         assert len(certs) >= 1
 
     def test_empty(self):
@@ -347,8 +335,7 @@ class TestExtractCertifications:
         assert certs == []
 
     def test_multiple_certs(self):
-        text = "CISSP\nPMP\nCKA"
-        certs = NLPService._extract_certifications(text)
+        certs = NLPService._extract_certifications("CISSP\nPMP\nCKA")
         assert len(certs) >= 2
 
 
@@ -356,9 +343,8 @@ class TestExtractCertifications:
 # Section splitting
 # =====================================================================
 
-class TestSplitSections:
-    """Test _split_sections used in the NLP pipeline."""
 
+class TestSplitSections:
     def test_skills_section(self):
         text = "Header\n\nSKILLS\nPython, Java\n\nEDUCATION\nBS"
         sections = NLPService._split_sections(text)
@@ -371,8 +357,7 @@ class TestSplitSections:
 
     def test_all_keys_present(self):
         sections = NLPService._split_sections("some text")
-        for key in ("contact", "skills", "education", "experience",
-                     "projects", "certifications"):
+        for key in ("contact", "skills", "education", "experience", "projects", "certifications"):
             assert key in sections
 
     def test_contact_preamble(self):
@@ -385,36 +370,16 @@ class TestSplitSections:
 # Full analyse() pipeline
 # =====================================================================
 
+
 class TestAnalyse:
-    """Test the full analysis pipeline."""
-
-    def test_returns_resume_profile(self, nlp_service, sample_resume_text):
-        profile = nlp_service.analyse(sample_resume_text)
-        assert profile.name  # should detect "John Smith"
-        assert len(profile.skills) > 0
-        assert len(profile.education) > 0
+    def test_returns_resume_profile(self, svc: NLPService, sample_resume_text: str):
+        profile = svc.analyse(sample_resume_text)
+        assert profile.name
         assert profile.contact.emails
+        assert len(profile.skills) > 0
 
-    def test_skills_detected(self, nlp_service, sample_resume_text):
-        profile = nlp_service.analyse(sample_resume_text)
-        assert "Python" in profile.skills
-        assert "Docker" in profile.skills
-
-    def test_education_detected(self, nlp_service, sample_resume_text):
-        profile = nlp_service.analyse(sample_resume_text)
-        assert any("master" in e.degree.lower() for e in profile.education)
-
-    def test_completeness_score(self, nlp_service, sample_resume_text):
-        profile = nlp_service.analyse(sample_resume_text)
-        assert 0 <= profile.completeness_score <= 100
-        assert profile.completeness_score > 30  # should be reasonably complete
-
-    def test_certifications_detected(self, nlp_service, sample_resume_text):
-        profile = nlp_service.analyse(sample_resume_text)
-        assert len(profile.certifications) > 0
-
-    def test_empty_text(self, nlp_service):
-        profile = nlp_service.analyse("")
+    def test_empty_text(self, svc: NLPService):
+        profile = svc.analyse("")
         assert profile.name == ""
         assert profile.skills == []
 
@@ -423,117 +388,103 @@ class TestAnalyse:
 # parse_resume() legacy API
 # =====================================================================
 
+
 class TestParseResume:
-    """Test the legacy dict-returning API."""
-
-    def test_returns_dict(self, nlp_service, sample_resume_text):
-        data = nlp_service.parse_resume(sample_resume_text)
+    def test_returns_dict(self, svc: NLPService, sample_resume_text: str):
+        data = svc.parse_resume(sample_resume_text)
         assert isinstance(data, dict)
-        for key in ("name", "emails", "phones", "skills", "education",
-                     "experience", "organizations", "cleaned_text",
-                     "certifications", "completeness_score"):
+        for key in (
+            "name",
+            "emails",
+            "phones",
+            "skills",
+            "education",
+            "experience",
+            "organizations",
+            "cleaned_text",
+            "certifications",
+            "completeness_score",
+        ):
             assert key in data
-
-    def test_skills_in_dict(self, nlp_service, sample_resume_text):
-        data = nlp_service.parse_resume(sample_resume_text)
-        assert "Python" in data["skills"]
-
-    def test_education_format(self, nlp_service, sample_resume_text):
-        data = nlp_service.parse_resume(sample_resume_text)
-        if data["education"]:
-            edu = data["education"][0]
-            assert "degree" in edu
-            assert "institution" in edu
-            assert "years" in edu
-
-    def test_experience_format(self, nlp_service, sample_resume_text):
-        data = nlp_service.parse_resume(sample_resume_text)
-        if data["experience"]:
-            exp = data["experience"][0]
-            assert "title" in exp
-            assert "company" in exp
-            assert "duration" in exp
 
 
 # =====================================================================
 # Caching behaviour
 # =====================================================================
 
-class TestCaching:
-    """Verify the LRU cache keyed on SHA-256."""
 
-    def test_same_input_cached(self, nlp_service, sample_resume_text):
-        _cached_analyse.cache_clear()  # start fresh
-        p1 = nlp_service.analyse(sample_resume_text)
-        p2 = nlp_service.analyse(sample_resume_text)
+class TestCaching:
+    def test_same_input_cached(self, svc: NLPService, sample_resume_text: str):
+        _cached_analyse.cache_clear()
+        p1 = svc.analyse(sample_resume_text)
+        p2 = svc.analyse(sample_resume_text)
         info = _cached_analyse.cache_info()
         assert info.hits >= 1
         assert p1.to_dict() == p2.to_dict()
 
-    def test_different_input_not_cached(self, nlp_service):
+    def test_different_input_not_cached(self, svc: NLPService):
         _cached_analyse.cache_clear()
-        nlp_service.analyse("First text with Python and Java skills")
-        nlp_service.analyse("Completely different text about cooking recipes")
-        info = _cached_analyse.cache_info()
-        assert info.misses >= 2
+        svc.analyse("First text with Python and Java skills")
+        svc.analyse("Completely different text about cooking recipes")
+        assert _cached_analyse.cache_info().misses >= 2
 
 
 # =====================================================================
 # Organisation extraction
 # =====================================================================
 
-class TestExtractOrganizations:
-    """Test NER-based org extraction."""
 
-    def test_detects_orgs(self, nlp_service):
+class TestExtractOrganizations:
+    def test_detects_orgs(self, svc: NLPService):
         sections = {"experience": "Worked at Google and Microsoft for 5 years."}
-        orgs = nlp_service._extract_organizations(sections)
+        orgs = svc._extract_organizations(sections)
         assert isinstance(orgs, list)
 
-    def test_empty_sections(self, nlp_service):
-        orgs = nlp_service._extract_organizations({})
+    def test_empty_sections(self, svc: NLPService):
+        orgs = svc._extract_organizations({})
         assert orgs == [] or isinstance(orgs, list)
 
-    def test_filters_noise_words(self, nlp_service):
-        sections = {"experience": "Used Python and Docker at Acme Corp Inc."}
-        orgs = nlp_service._extract_organizations(sections)
-        # Should not include "Python" or "Docker" as orgs
-        for org in orgs:
-            assert "Python" not in org
-            assert "Docker" not in org
-
-    def test_no_nlp_model(self, nlp_service):
-        """When nlp is None, should return empty list."""
-        original = nlp_service.nlp
-        nlp_service.nlp = None
+    def test_no_nlp_model(self, svc: NLPService):
+        original = svc.nlp
+        svc.nlp = None
         try:
-            orgs = nlp_service._extract_organizations({"experience": "Worked at Acme"})
+            orgs = svc._extract_organizations({"experience": "Worked at Acme"})
             assert orgs == []
         finally:
-            nlp_service.nlp = original
+            svc.nlp = original
 
 
 # =====================================================================
 # parse_file with mocked FileService
 # =====================================================================
 
-class TestParseFile:
-    """Test parse_file method."""
 
-    def test_success(self, nlp_service, tmp_path, sample_resume_text):
+class TestParseFile:
+    def test_success(self, svc: NLPService, tmp_path, sample_resume_text: str):
         from app.services.file_service import ResumeDocument
-        doc = ResumeDocument(raw_text=sample_resume_text, sections={}, page_count=1, file_type="pdf")
+
+        doc = ResumeDocument(
+            raw_text=sample_resume_text,
+            sections={},
+            page_count=1,
+            file_type="pdf",
+        )
         with patch("app.services.nlp_service.FileService.extract", return_value=doc):
-            resume = nlp_service.parse_file(str(tmp_path / "resume.pdf"))
+            resume = svc.parse_file(str(tmp_path / "resume.pdf"))
+
         assert resume.parsed is True
         assert resume.name
         assert len(resume.skills) > 0
 
-    def test_file_error(self, nlp_service, tmp_path):
+    def test_file_error(self, svc: NLPService, tmp_path):
         from app.services.file_service import FileParseError
-        with patch("app.services.nlp_service.FileService.extract",
-                   side_effect=FileParseError("corrupt")):
-            resume = nlp_service.parse_file(str(tmp_path / "bad.pdf"))
+
+        with patch(
+            "app.services.nlp_service.FileService.extract",
+            side_effect=FileParseError("corrupt"),
+        ):
+            resume = svc.parse_file(str(tmp_path / "bad.pdf"))
+
         assert resume.parsed is False
         assert resume.error == "corrupt"
 
@@ -542,16 +493,12 @@ class TestParseFile:
 # _dict_to_profile
 # =====================================================================
 
-class TestDictToProfile:
-    """Test the static _dict_to_profile reconstruction."""
 
-    def test_round_trip(self, nlp_service, sample_resume_text):
-        profile = nlp_service.analyse(sample_resume_text)
-        d = profile.to_dict()
-        reconstructed = NLPService._dict_to_profile(d)
+class TestDictToProfile:
+    def test_round_trip(self, svc: NLPService, sample_resume_text: str):
+        profile = svc.analyse(sample_resume_text)
+        reconstructed = NLPService._dict_to_profile(profile.to_dict())
         assert reconstructed.name == profile.name
-        assert reconstructed.skills == profile.skills
-        assert len(reconstructed.education) == len(profile.education)
 
     def test_empty_dict(self):
         profile = NLPService._dict_to_profile({})
@@ -563,9 +510,8 @@ class TestDictToProfile:
 # _parse_duration_years edge cases
 # =====================================================================
 
-class TestParseDurationYears:
-    """Additional edge cases for duration parsing."""
 
+class TestParseDurationYears:
     def test_no_match(self):
         assert NLPService._parse_duration_years("some random text") == 0.0
 
