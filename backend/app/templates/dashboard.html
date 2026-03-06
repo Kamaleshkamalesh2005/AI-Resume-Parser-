@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Results Dashboard - NeuralMatch AI</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8 fade-in">
+    <section class="glass-card p-8 glow-card">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+                <p class="chip mb-3">Premium AI Recruitment Insights</p>
+                <h1 class="text-4xl font-bold text-white mb-2">Results Intelligence Dashboard</h1>
+                <p class="text-gray-300">Rank candidates by AI fit score, inspect skills alignment, and visualize match quality instantly.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 min-w-[240px]">
+                <div class="mini-tile text-center">
+                    <p class="mini-label">Ranked Candidates</p>
+                    <p id="totalCandidates" class="mini-value">0</p>
+                </div>
+                <div class="mini-tile text-center">
+                    <p class="mini-label">Average Score</p>
+                    <p id="avgScore" class="mini-value">0%</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="glass-card p-6 glow-card hover-lift xl:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-neon-blue">Candidate Ranking</h2>
+                <span class="text-xs text-gray-300">Sorted by final score</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[640px] ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Candidate</th>
+                            <th>Semantic</th>
+                            <th>Keyword</th>
+                            <th>Final Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card p-6 glow-card hover-lift">
+            <h2 class="text-2xl font-bold text-neon-purple mb-4">Skill Alignment</h2>
+            <div id="selectedCandidate" class="mb-4 text-sm text-gray-200">Select a candidate row to inspect details.</div>
+
+            <div class="space-y-4">
+                <div class="result-panel">
+                    <h3 class="font-semibold text-neon-blue mb-2">Matched Skills</h3>
+                    <div id="matchedSkills" class="min-h-[52px]"></div>
+                </div>
+                <div class="result-panel">
+                    <h3 class="font-semibold text-neon-purple mb-2">Missing Skills</h3>
+                    <div id="missingSkills" class="min-h-[52px]"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-card p-6 glow-card hover-lift">
+            <h2 class="text-2xl font-bold text-neon-blue mb-4">Score Distribution</h2>
+            <div class="space-y-3" id="scoreBars"></div>
+        </div>
+
+        <div class="glass-card p-6 glow-card hover-lift">
+            <h2 class="text-2xl font-bold text-neon-purple mb-4">Match vs Missing Skills</h2>
+            <div class="max-w-xs mx-auto">
+                <canvas id="skillsPieChart" height="260"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-card p-6 glow-card hover-lift">
+            <h2 class="text-xl font-bold text-neon-blue mb-4">System Health</h2>
+            <div id="healthSummary" class="space-y-2 text-sm text-gray-200"></div>
+        </div>
+
+        <div class="glass-card p-6 glow-card hover-lift">
+            <h2 class="text-xl font-bold text-neon-purple mb-4">Model Snapshot</h2>
+            <div id="modelSnapshot" class="space-y-2 text-sm text-gray-200"></div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

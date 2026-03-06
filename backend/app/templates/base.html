@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Matcher</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <div class="ambient-bg">
+        <span class="orb orb-blue"></span>
+        <span class="orb orb-purple"></span>
+        <span class="orb orb-indigo"></span>
+    </div>
+
+    <div id="aiLoadingScreen" class="loading-screen" aria-live="polite" aria-hidden="true">
+        <div class="loading-content">
+            <div class="beam-field" aria-hidden="true">
+                <span class="beam beam-1"></span>
+                <span class="beam beam-2"></span>
+                <span class="beam beam-3"></span>
+            </div>
+            <div class="scanner-wrap" aria-hidden="true">
+                <span class="scanner-ring"></span>
+                <span class="scanner-ring ring-2"></span>
+                <span class="scanner-sweep"></span>
+            </div>
+            <div class="gradient-loader" aria-hidden="true"></div>
+            <p class="loading-title">Analyzing Candidates...</p>
+        </div>
+    </div>
+
+    <nav class="navbar-glass sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="text-xl md:text-2xl font-bold text-neon-blue">
+                NeuralMatch AI
+            </div>
+            <div class="flex gap-4 md:gap-6 text-sm md:text-base">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="#resultsSection" class="nav-link">Results</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4 py-8 fade-in">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} p-4 rounded mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="relative z-10 py-10 text-center text-gray-400">
+        <p>&copy; 2026 NeuralMatch AI Resume Matcher</p>
+        <p class="text-sm mt-2">Flask • spaCy • scikit-learn • Tailwind CSS</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

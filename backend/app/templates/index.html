@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>NeuralMatch AI - Resume Intelligence</title>
+{% endblock %}
+
+{% block content %}
+<section class="hero-grid mb-8">
+    <div class="glass-card p-8 slide-in">
+        <p class="chip mb-4">AI Candidate Intelligence</p>
+        <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4 text-white">
+            Resume Matching Dashboard
+            <span class="text-neon-purple">for Modern Hiring</span>
+        </h1>
+        <p class="text-gray-300 text-lg mb-8 max-w-2xl">
+            Upload resumes, parse candidate signals, and score fit against your job description with an AI-first workflow.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="metric-card">
+                <p class="metric-label">Upload Speed</p>
+                <p class="metric-value">Real-time</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">AI Parsing</p>
+                <p class="metric-value">spaCy + ML</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Formats</p>
+                <p class="metric-value">PDF / DOCX</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card p-8 relative overflow-hidden">
+        <div class="floating-ring"></div>
+        <h2 class="text-2xl font-semibold mb-4 text-neon-blue">Pipeline Status</h2>
+        <div id="pipelineStatus" class="space-y-4 text-sm text-gray-300">
+            <div class="status-row"><span>Parser</span><span class="status-loading">Loading...</span></div>
+            <div class="status-row"><span>ML Engine</span><span class="status-loading">Loading...</span></div>
+            <div class="status-row"><span>Storage</span><span class="status-loading">Loading...</span></div>
+            <div class="status-row"><span>Logs</span><span class="status-loading">Loading...</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-8">
+    <div class="glass-card p-8">
+        <h3 class="text-2xl font-bold mb-4 text-neon-purple">Job Description</h3>
+        <form id="jobDescriptionForm" class="space-y-4">
+            <textarea
+                id="jobDescriptionText"
+                class="w-full p-4 rounded-lg bg-black bg-opacity-30 border border-indigo-400 border-opacity-40 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                rows="5"
+                placeholder="Paste job description here..."></textarea>
+
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <input type="file" id="jobDescriptionFile" class="text-sm text-gray-200" accept=".pdf,.docx,.doc,.txt">
+                <button type="submit" class="btn-neon btn-neon-purple px-5">
+                    Save Job Description
+                </button>
+            </div>
+        </form>
+        <div id="jobDescriptionStatus" class="mt-4 text-sm text-gray-200 hidden"></div>
+    </div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="glass-card p-8">
+        <h3 class="text-2xl font-bold mb-6 text-neon-blue">Single Resume Upload</h3>
+
+        <form id="uploadForm" class="space-y-5">
+            <div id="dropZone" class="drop-zone">
+                <div class="text-4xl mb-3">⬆</div>
+                <p class="text-lg font-semibold text-white">Drag and drop resume</p>
+                <p class="text-sm text-gray-300 mt-2">or click to browse (PDF, DOCX, TXT)</p>
+                <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.doc,.txt">
+            </div>
+
+            <div id="singleProgressWrap" class="hidden progress-wrap">
+                <div class="flex justify-between text-xs text-gray-300 mb-2">
+                    <span>Processing candidate profile</span>
+                    <span id="singleProgressText">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div id="singleProgressBar" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-neon w-full">
+                Analyze Resume
+            </button>
+        </form>
+
+        <div id="uploadStatus" class="mt-5 hidden">
+            <div class="result-panel">
+                <p class="font-semibold text-neon-blue">Upload processed successfully</p>
+                <div id="statusDetails" class="text-sm mt-2 text-gray-200"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card p-8">
+        <h3 class="text-2xl font-bold mb-6 text-neon-purple">Batch Resume Upload</h3>
+
+        <form id="batchForm" class="space-y-4">
+            <div id="dropZoneBatch" class="drop-zone drop-zone-purple">
+                <div class="text-4xl mb-3">📂</div>
+                <p class="text-lg font-semibold text-white">Drop multiple resumes</p>
+                <p class="text-sm text-gray-300 mt-2">Batch process for ranked matching</p>
+                <input type="file" id="fileInputBatch" class="hidden" accept=".pdf,.docx,.doc,.txt" multiple>
+            </div>
+
+            <div id="batchProgressWrap" class="hidden progress-wrap">
+                <div class="flex justify-between text-xs text-gray-300 mb-2">
+                    <span>Batch processing queue</span>
+                    <span id="batchProgressText">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div id="batchProgressBar" class="progress-fill progress-fill-purple" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="fileList" class="space-y-2 max-h-40 overflow-y-auto hidden file-list-panel">
+            </div>
+
+            <button type="submit" class="btn-neon btn-neon-purple w-full">
+                Process Batch Upload
+            </button>
+        </form>
+    </div>
+</section>
+
+<section id="resultsSection" class="mt-8 glass-card p-8 hidden">
+    <h3 class="text-2xl font-bold mb-4 text-neon-blue">Processing Results</h3>
+    <div id="resultsContent" class="space-y-4"></div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <div class="mini-tile">
+            <p class="mini-label">Model Status</p>
+            <p class="mini-value">Operational</p>
+        </div>
+        <div class="mini-tile">
+            <p class="mini-label">Inference Mode</p>
+            <p class="mini-value">Realtime</p>
+        </div>
+        <div class="mini-tile">
+            <p class="mini-label">Theme</p>
+            <p class="mini-value">Dark AI</p>
+        </div>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script>
+(async function loadPipelineStatus() {
+    const nameMap = { nlp_model: 'Parser', ml_model: 'ML Engine', storage: 'Storage', logs: 'Logs' };
+    try {
+        const resp = await fetch('/api/dashboard/health');
+        const data = await resp.json();
+        const container = document.getElementById('pipelineStatus');
+        if (!container || !data.success) return;
+        container.innerHTML = '';
+        for (const [key, status] of Object.entries(data.components || {})) {
+            const label = nameMap[key] || key;
+            const ok = Boolean(status.ok);
+            container.innerHTML += `<div class="status-row"><span>${label}</span><span class="${ok ? 'status-ok' : 'status-error'}">${ok ? 'Online' : 'Offline'}</span></div>`;
+        }
+    } catch (_) {}
+})();
+</script>
+{% endblock %}

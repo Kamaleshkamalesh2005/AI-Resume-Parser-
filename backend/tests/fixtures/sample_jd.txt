@@ -1,0 +1,31 @@
+We are looking for a Senior Software Engineer to join our growing team.
+
+Requirements:
+- 5+ years of experience in software development
+- Strong proficiency in Python, JavaScript, and SQL
+- Experience with cloud platforms (AWS, Azure, or GCP)
+- Proficiency with Docker and Kubernetes for containerized deployments
+- Experience building RESTful APIs with Flask or Django
+- Knowledge of relational databases (PostgreSQL, MySQL)
+- Familiarity with CI/CD pipelines (Jenkins, GitHub Actions)
+- Experience with Agile/Scrum methodologies
+- Strong understanding of data structures and algorithms
+- Excellent communication and collaboration skills
+
+Nice to have:
+- Experience with machine learning frameworks (TensorFlow, PyTorch)
+- Knowledge of React or Angular for frontend development
+- Contributions to open-source projects
+- AWS Certified Solutions Architect or similar certification
+- Experience with Redis, RabbitMQ, or Kafka
+
+Education:
+- Bachelor's degree in Computer Science, Engineering, or related field
+- Master's degree preferred
+
+Responsibilities:
+- Design and implement scalable backend services
+- Collaborate with cross-functional teams to define technical requirements
+- Write clean, maintainable, and well-tested code
+- Participate in code reviews and mentor junior engineers
+- Contribute to architectural decisions and technology evaluations
