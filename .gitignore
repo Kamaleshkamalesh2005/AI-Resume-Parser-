@@ -82,6 +82,11 @@ env/
 uploads/
 logs/
 models/
+# Allow Python source model packages to be tracked
+!app/models/
+!app/models/**
+!backend/app/models/
+!backend/app/models/**
 *.pkl
 *.db
 *.sqlite
