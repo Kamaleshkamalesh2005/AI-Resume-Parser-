@@ -3,7 +3,6 @@ Input Validation Module
 Validates file uploads, file formats, and data integrity
 """
 
-import os
 import regex as re
 from werkzeug.utils import secure_filename
 import logging
@@ -41,8 +40,6 @@ def validate_file_upload(file, allowed_extensions):
     Returns:
         tuple: (is_valid, error_message)
     """
-    errors = []
-    
     # Check if file exists
     if not file or file.filename == '':
         return False, 'No file selected'

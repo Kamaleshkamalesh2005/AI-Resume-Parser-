@@ -15,7 +15,7 @@ import functools
 import hashlib
 import logging
 import re
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 import spacy
 

@@ -24,7 +24,6 @@ from typing import Any, Dict, List, Tuple
 from flask import Blueprint, current_app, jsonify, request
 from werkzeug.datastructures import FileStorage
 
-from app.models.resume import Resume
 from app.services.file_service import FileParseError, FileService
 from app.services.ml_service import MLService
 from app.services.nlp_service import NLPService
@@ -156,7 +155,6 @@ def upload_job_description():
             
             try:
                 from app.core import UniversalResumeParser
-                from pathlib import Path
                 saved_path = FileService.save_upload(file_obj, current_app.config["UPLOAD_FOLDER"])
                 parser = UniversalResumeParser()
                 raw_text = parser.text_extractor.extract(saved_path)

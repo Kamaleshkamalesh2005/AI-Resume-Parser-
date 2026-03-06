@@ -61,7 +61,7 @@ def download_spacy_model():
             print("✓ spaCy model downloaded successfully\n")
             return True
         else:
-            print(f"Note: You can download later with:")
+            print("Note: You can download later with:")
             print("  python -m spacy download en_core_web_sm\n")
             return False
     except Exception as e:
@@ -123,7 +123,7 @@ def train_models():
             print("✓ Models trained successfully\n")
             return True
         else:
-            print(f"Note: You can train models later with: python train_models.py\n")
+            print("Note: You can train models later with: python train_models.py\n")
             return False
     except subprocess.TimeoutExpired:
         print("⚠️  Model training timed out\n")

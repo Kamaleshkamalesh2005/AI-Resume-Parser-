@@ -6,7 +6,6 @@ Handles text vectorization and similarity computation using TF-IDF and Cosine Si
 import pickle
 import os
 import logging
-import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics.pairwise import cosine_similarity

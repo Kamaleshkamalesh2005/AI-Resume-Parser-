@@ -5,8 +5,7 @@ Integration service for Flask app with the 9-step production parser.
 """
 
 import logging
-from typing import Dict, Any, Optional
-from pathlib import Path
+from typing import Dict, Any
 
 from app.core import get_parser
 

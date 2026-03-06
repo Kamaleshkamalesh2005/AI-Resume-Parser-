@@ -20,7 +20,7 @@ import os
 import re
 import uuid
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
@@ -423,7 +423,7 @@ class FileService:
                 return FileService._read_pdf_fallback(filepath)
             except FileParseError:
                 raise
-            except Exception as fallback_exc:
+            except Exception:
                 raise FileParseError(
                     f"PDF extraction failed (pdfplumber, then fallback): {exc}",
                     filepath=filepath,

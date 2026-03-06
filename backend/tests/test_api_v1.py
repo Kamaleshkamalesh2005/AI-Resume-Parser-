@@ -400,6 +400,5 @@ class TestEnvelopeFormat:
 
     def test_error_response_has_errors_list(self, client):
         resp = client.post("/api/v1/match", json={})
-        body = _json(resp)
         # flask-smorest returns validation errors in its own format
         assert resp.status_code == 422

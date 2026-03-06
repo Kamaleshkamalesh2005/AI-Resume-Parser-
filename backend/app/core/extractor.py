@@ -19,11 +19,9 @@ Steps:
 
 import re
 import logging
-from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, field
 from difflib import SequenceMatcher
-import json
 
 try:
     import fitz  # PyMuPDF
@@ -41,7 +39,7 @@ try:
 except ImportError:
     NLP = None
 
-from .skill_dict import SKILLS_LOWERCASE, is_skill
+from .skill_dict import SKILLS_LOWERCASE
 from .section_aliases import SECTION_ALIASES, FUZZY_MATCH_THRESHOLD
 
 logger = logging.getLogger(__name__)

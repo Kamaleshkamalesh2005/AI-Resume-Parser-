@@ -21,8 +21,6 @@ Cross-cutting:
 
 from __future__ import annotations
 
-import hashlib
-import json
 import logging
 import os
 import time
@@ -30,19 +28,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
+import hashlib
+import json
+import requests
 from flask import current_app, request
 from flask.views import MethodView
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_smorest import Api, Blueprint
+from flask_smorest import Blueprint
 
 from app.blueprints.api.schemas import (
     BatchMatchRequestSchema,
     FeedbackRequestSchema,
     MatchRequestSchema,
-    MatchResultSchema,
     ParseRequestSchema,
-    ResumeProfileSchema,
     ScrapeRequestSchema,
 )
 from app.services.file_service import FileService, FileParseError
@@ -350,7 +349,7 @@ class ExtractResource(MethodView):
         if file_size > max_size:
             return _envelope(
                 success=False,
-                errors=[f"File too large (max 5 MB)"],
+                errors=["File too large (max 5 MB)"],
                 data=None,
                 latency_ms=(time.perf_counter() - t0) * 1000,
                 status=400
@@ -396,7 +395,7 @@ class ExtractResource(MethodView):
                 # Clean up temp file
                 try:
                     os.unlink(tmp_path)
-                except:
+                except OSError:
                     pass
         
         except FileParseError as e:
@@ -558,7 +557,6 @@ class MatchHistoryResource(MethodView):
         """Return recent match history (paginated)."""
         t0 = time.perf_counter()
         try:
-            from app.extensions import db
             from app.models.db_models import MatchHistory
 
             page = request.args.get("page", 1, type=int)

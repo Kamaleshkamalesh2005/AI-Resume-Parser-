@@ -8,10 +8,6 @@ installed – the SBERT encoder is mocked where necessary.
 
 from __future__ import annotations
 
-import shutil
-import tempfile
-from pathlib import Path
-from typing import Dict, List
 from unittest.mock import MagicMock, patch
 
 import numpy as np

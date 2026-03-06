@@ -76,8 +76,8 @@ def _get_sbert(quantized: bool = False):
             from optimum.onnxruntime import ORTModelForFeatureExtraction
             from transformers import AutoTokenizer
 
-            tokenizer = AutoTokenizer.from_pretrained(f"sentence-transformers/{model_name}")
-            ort_model = ORTModelForFeatureExtraction.from_pretrained(
+            AutoTokenizer.from_pretrained(f"sentence-transformers/{model_name}")
+            ORTModelForFeatureExtraction.from_pretrained(
                 f"sentence-transformers/{model_name}",
                 export=True,
             )

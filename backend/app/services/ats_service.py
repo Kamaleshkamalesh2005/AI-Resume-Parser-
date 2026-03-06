@@ -16,7 +16,6 @@ Analyses a resume from the perspective of an automated ATS parser:
 from __future__ import annotations
 
 import re
-from collections import Counter
 from typing import Any, Dict, List, Set, Tuple
 
 from app.utils.skills_dict import SKILLS_DICT

@@ -17,12 +17,9 @@ Tests cover:
 
 from __future__ import annotations
 
-import io
 import os
-import textwrap
 from io import BytesIO
-from typing import List
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -184,7 +181,6 @@ def _mock_pdfplumber(mock_pdf):
     """Context manager that patches pdfplumber at the import point inside
     ``FileService._read_pdf`` so it works even when pdfplumber is not
     installed in the test environment."""
-    import importlib
     import sys
     fake_pdfplumber = MagicMock()
     fake_pdfplumber.open.return_value = mock_pdf
@@ -295,10 +291,14 @@ class TestDocxExtraction:
         mock_doc = MagicMock()
         mock_doc.paragraphs = [self._make_para("Skills\nPython")]
 
-        cell1 = MagicMock(); cell1.text = "Language"
-        cell2 = MagicMock(); cell2.text = "Level"
-        row = MagicMock(); row.cells = [cell1, cell2]
-        table = MagicMock(); table.rows = [row]
+        cell1 = MagicMock()
+        cell1.text = "Language"
+        cell2 = MagicMock()
+        cell2.text = "Level"
+        row = MagicMock()
+        row.cells = [cell1, cell2]
+        table = MagicMock()
+        table.rows = [row]
         mock_doc.tables = [table]
 
         with patch("docx.Document", return_value=mock_doc):
@@ -419,7 +419,7 @@ class TestSaveUpload:
         fs = _make_file_storage("resume.pdf", content=content)
         fs.save = MagicMock()
 
-        path = FileService.save_upload(fs, dest_dir)
+        FileService.save_upload(fs, dest_dir)
         assert os.path.isdir(dest_dir)
 
     def test_save_invalid_file_raises(self, tmp_path):

@@ -6,7 +6,6 @@ Sets up centralized logging for the application with file and console output.
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-from app.utils.config import Config
 from flask import has_request_context, request
 
 

@@ -20,8 +20,6 @@ Tests cover:
 
 from __future__ import annotations
 
-import textwrap
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 import numpy as np

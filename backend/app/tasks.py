@@ -8,13 +8,9 @@ emitted via Flask-SocketIO so connected clients see real-time updates.
 
 from __future__ import annotations
 
-import hashlib
-import json
 import logging
 import time
 from typing import Any, Dict, List
-
-from celery import current_task
 
 from app.celery_app import celery_app
 
