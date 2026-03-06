@@ -29,7 +29,7 @@ class BatchMatchRequestSchema(Schema):
     resume_filenames = fields.List(
         fields.String(),
         required=False,
-        missing=None,
+        load_default=None,
         allow_none=True,
     )
     job_description = fields.String(

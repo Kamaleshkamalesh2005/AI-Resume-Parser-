@@ -29,15 +29,16 @@ class UploadUseCase:
                 "message": error,
             }, 400
 
-        success, result = FileService.save_upload(file_obj, self.upload_folder)
-        if not success:
+        try:
+            file_path = FileService.save_upload(file_obj, self.upload_folder)
+        except Exception as exc:
             return {
                 "success": False,
                 "error": "Upload failed",
-                "message": result,
+                "message": str(exc),
             }, 500
 
-        resume = ResumeModel(filepath=result)
+        resume = ResumeModel(filepath=file_path)
         if not resume.load_from_file():
             return {
                 "success": False,
@@ -70,10 +71,7 @@ class UploadUseCase:
                     failed.append({"filename": file_obj.filename, "error": error})
                     continue
 
-                success, file_path = FileService.save_upload(file_obj, self.upload_folder)
-                if not success:
-                    failed.append({"filename": file_obj.filename, "error": file_path})
-                    continue
+                file_path = FileService.save_upload(file_obj, self.upload_folder)
 
                 resume = ResumeModel(filepath=file_path)
                 if resume.load_from_file() and resume.parse():
@@ -126,24 +124,25 @@ class UploadUseCase:
                 "message": error,
             }, 400
 
-        success, path_or_error = FileService.save_upload(file_obj, self.upload_folder)
-        if not success:
+        try:
+            file_path = FileService.save_upload(file_obj, self.upload_folder)
+        except Exception as exc:
             return {
                 "success": False,
                 "error": "Upload failed",
-                "message": path_or_error,
+                "message": str(exc),
             }, 500
 
-        file_path = path_or_error
-        extract_ok, extracted = FileService.extract_text(file_path)
-        if not extract_ok:
+        try:
+            extracted_doc = FileService.extract_fast(file_path)
+        except Exception as exc:
             return {
                 "success": False,
                 "error": "File processing failed",
-                "message": extracted,
+                "message": str(exc),
             }, 400
 
-        jd_content = extracted.strip()
+        jd_content = extracted_doc.raw_text.strip()
         if not jd_content:
             return {
                 "success": False,

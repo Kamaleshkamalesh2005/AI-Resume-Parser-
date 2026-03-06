@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 
-from celery import Celery
+from celery import Celery, Task
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +35,13 @@ def make_celery(app=None) -> Celery:
             result_expires=3600,
         )
 
-        class ContextTask(celery_app.Task):
+        class ContextTask(Task):
             """Ensure every task runs inside the Flask application context."""
             def __call__(self, *args, **kwargs):
                 with app.app_context():
                     return self.run(*args, **kwargs)
 
-        celery_app.Task = ContextTask  # type: ignore[misc]
+        celery_app.Task = ContextTask  # type: ignore[assignment]
 
     logger.info("Celery configured (broker=%s)", celery_app.conf.broker_url)
     return celery_app

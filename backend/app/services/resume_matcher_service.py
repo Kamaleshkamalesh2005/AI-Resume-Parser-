@@ -24,7 +24,7 @@ Usage:
 
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import joblib
 
@@ -60,9 +60,9 @@ class ResumeMatcherService:
             models_dir: Directory containing the trained pipeline artifact
         """
         self.models_dir = Path(models_dir)
-        self.pipeline = None
+        self.pipeline: Any = None
         self.is_ready = False
-        self.error_message = None
+        self.error_message: Optional[str] = None
 
         self._load_pipeline()
 

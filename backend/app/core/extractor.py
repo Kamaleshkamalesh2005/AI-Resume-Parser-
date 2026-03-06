@@ -186,7 +186,7 @@ class SectionDetector:
         
         lines = text.split('\n')
         current_section = "contact"  # First section is contact
-        current_content = []
+        current_content: List[str] = []
         
         for i, line in enumerate(lines):
             # Check if line is a section heading

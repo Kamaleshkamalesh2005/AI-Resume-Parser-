@@ -19,6 +19,7 @@ marshmallow>=3.20.0
 python-dotenv>=1.0.0
 beautifulsoup4>=4.12.0
 requests>=2.31.0
+types-requests>=2.32.0.20250328
 gunicorn>=21.2.0;sys_platform!="win32"
 
 # ── Phase 10: Production Optimization ──

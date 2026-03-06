@@ -229,8 +229,8 @@ class BatchMatchResource(MethodView):
         all_results.sort(key=lambda r: r["score"], reverse=True)
         
         # Add rank numbers after sorting
-        for rank, result in enumerate(all_results, start=1):
-            result["rank"] = rank
+        for rank, row in enumerate(all_results, start=1):
+            row["rank"] = rank
 
         # Pagination
         page: int = payload.get("page", 1)

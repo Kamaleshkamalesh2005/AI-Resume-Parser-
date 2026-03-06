@@ -14,7 +14,7 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-_redis_client = None
+_redis_client: Any | None = None
 _fallback: Dict[str, str] = {}
 
 
@@ -47,6 +47,7 @@ def cache_get(text: str, prefix: str = "nlp") -> Optional[Dict[str, Any]]:
     """Return cached JSON dict for *text*, or ``None``."""
     k = _key(text, prefix)
     try:
+        raw: str | None
         if _redis_client is not None:
             raw = _redis_client.get(k)
         else:
