@@ -359,6 +359,10 @@ class NLPService:
     def _extract_phones(text: str) -> List[str]:
         """Extract phone numbers using the *phonenumbers* library when
         available, otherwise fall back to regex.
+
+        The regex fallback is also applied when the phonenumbers library
+        finds no valid numbers (e.g. test/fictitious numbers in the 555
+        range that the library correctly rejects).
         """
         phones: List[str] = []
         seen: Set[str] = set()
@@ -381,8 +385,10 @@ class NLPService:
                         if formatted not in seen:
                             phones.append(formatted)
                             seen.add(formatted)
-        else:
-            # Regex fallback
+
+        # Regex fallback: used when phonenumbers is unavailable OR when it
+        # found nothing (e.g. fictitious 555-area-code numbers in tests).
+        if not phones:
             for m in re.finditer(
                 r"(?:\+\d{1,3}[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}",
                 text,

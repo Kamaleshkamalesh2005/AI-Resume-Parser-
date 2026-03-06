@@ -82,6 +82,14 @@ env/
 uploads/
 logs/
 models/
+# Allow Python source model packages to be tracked
+!app/models/
+!app/models/**
+!backend/app/models/
+!backend/app/models/**
+# But still exclude cache/compiled files within model packages
+app/models/__pycache__/
+backend/app/models/__pycache__/
 *.pkl
 *.db
 *.sqlite
