@@ -1,3 +1,6 @@
+# NOTE: Keep this file identical to app/blueprints/api/__init__.py
+# to avoid divergence between "app/" and "backend/app/" blueprints.
+
 """
 API Blueprint – all JSON REST endpoints under ``/api``.
 
