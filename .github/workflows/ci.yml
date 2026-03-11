@@ -42,7 +42,7 @@ jobs:
 
       - name: Test (pytest)
         run: |
-          pytest tests/ \
+          pytest backend/tests/ \
             --cov=backend/app \
             --cov-report=term-missing \
             -q
