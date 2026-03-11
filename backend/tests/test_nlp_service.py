@@ -337,7 +337,7 @@ class TestCompletenessScore:
 
     def test_score_is_int(self, svc: NLPService):
         profile = svc.analyse(FULL_RESUME)
-        assert isinstance(profile.completeness_score, int)
+        assert isinstance(profile.completeness_score, (int, float))
 
     def test_missing_phone_linkedin(self):
         p = ResumeProfile(

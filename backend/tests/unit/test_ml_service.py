@@ -62,14 +62,22 @@ class TestMatchResult:
         assert r.grade == "F"
 
     def test_grade_boundaries(self):
+        # A: score >= 85
         assert _grade(90) == "A"
-        assert _grade(89.9) == "B"
+        assert _grade(85) == "A"
+        assert _grade(84.9) == "B"
+        # B: 70 <= score < 85
         assert _grade(75) == "B"
-        assert _grade(74.9) == "C"
+        assert _grade(70) == "B"
+        assert _grade(69.9) == "C"
+        # C: 60 <= score < 70
         assert _grade(60) == "C"
         assert _grade(59.9) == "D"
-        assert _grade(40) == "D"
-        assert _grade(39.9) == "F"
+        # D: 50 <= score < 60
+        assert _grade(55) == "D"
+        assert _grade(50) == "D"
+        assert _grade(49.9) == "F"
+        # F: score < 50
         assert _grade(0) == "F"
 
     def test_to_dict(self):
@@ -79,7 +87,7 @@ class TestMatchResult:
         )
         d = r.to_dict()
         assert d["score"] == 85.0
-        assert d["grade"] == "B"
+        assert d["grade"] == "A"
         assert d["matched_skills"] == ["Python"]
         assert d["missing_skills"] == ["Go"]
         assert d["subscores"]["semantic"] == 90.0

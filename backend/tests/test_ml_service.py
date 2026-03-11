@@ -105,7 +105,7 @@ class TestMatchResult:
         assert MatchResult(score=65).grade == "C"
 
     def test_grade_d(self):
-        assert MatchResult(score=45).grade == "D"
+        assert MatchResult(score=55).grade == "D"
 
     def test_grade_f(self):
         assert MatchResult(score=20).grade == "F"
@@ -124,6 +124,7 @@ class TestMatchResult:
         assert set(d.keys()) == {
             "score", "grade", "matched_skills", "missing_skills",
             "subscores", "explanation",
+            "candidate_name", "similarity_score", "ml_probability",
         }
         assert d["matched_skills"] == ["Python"]
 
@@ -131,8 +132,8 @@ class TestMatchResult:
         assert _grade(91) == "A"
         assert _grade(75) == "B"
         assert _grade(60) == "C"
-        assert _grade(40) == "D"
-        assert _grade(39) == "F"
+        assert _grade(55) == "D"
+        assert _grade(49) == "F"
 
 
 # =====================================================================

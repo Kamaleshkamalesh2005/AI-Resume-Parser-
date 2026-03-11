@@ -215,6 +215,7 @@ class TestPdfExtraction:
         pdf_path = str(tmp_path / "empty.pdf")
         (tmp_path / "empty.pdf").write_bytes(b"%PDF")
 
+        # Mock pdfplumber to return a page with no text
         mock_page = MagicMock()
         mock_page.extract_text.return_value = ""
         mock_pdf = MagicMock()
@@ -222,9 +223,23 @@ class TestPdfExtraction:
         mock_pdf.__enter__ = lambda s: s
         mock_pdf.__exit__ = MagicMock(return_value=False)
 
+        # Also mock fitz so the fallback returns no text instead of crashing
+        import sys
+        mock_fitz_page = MagicMock()
+        mock_fitz_page.get_text.return_value = ""
+        mock_fitz_pdf = MagicMock()
+        mock_fitz_pdf.__len__ = MagicMock(return_value=1)
+        mock_fitz_pdf.__iter__ = MagicMock(return_value=iter([mock_fitz_page]))
+        mock_fitz_pdf.__getitem__ = MagicMock(return_value=mock_fitz_page)
+        mock_fitz_pdf.__enter__ = lambda s: s
+        mock_fitz_pdf.__exit__ = MagicMock(return_value=False)
+        mock_fitz = MagicMock()
+        mock_fitz.open.return_value = mock_fitz_pdf
+
         with _mock_pdfplumber(mock_pdf):
-            with pytest.raises(FileParseError, match="No text could be extracted"):
-                FileService.extract(pdf_path)
+            with patch.dict(sys.modules, {"fitz": mock_fitz}):
+                with pytest.raises(FileParseError, match="No text could be extracted"):
+                    FileService.extract(pdf_path)
 
     def test_corrupt_pdf(self, tmp_path):
         pdf_path = str(tmp_path / "corrupt.pdf")

@@ -38,12 +38,14 @@ jobs:
           python -m spacy download en_core_web_sm
 
       - name: Type check (mypy) - non-blocking
-        run: mypy backend/app --ignore-missing-imports --no-strict-optional || true
+        working-directory: backend
+        run: mypy app --ignore-missing-imports --no-strict-optional || true
 
       - name: Test (pytest)
+        working-directory: backend
         run: |
-          pytest backend/tests/ \
-            --cov=backend/app \
+          pytest tests/ \
+            --cov=app \
             --cov-report=term-missing \
             -q
 

@@ -107,7 +107,7 @@ class TestExtractContact:
 
     def test_phone_number(self):
         contact = NLPService._extract_contact(
-            "Call +1 (555) 123-4567 anytime"
+            "Call +1 (212) 555-0181 anytime"
         )
         assert len(contact.phones) >= 1
 
@@ -124,11 +124,11 @@ class TestExtractPhones:
     """Test _extract_phones static method."""
 
     def test_us_number(self):
-        phones = NLPService._extract_phones("Phone: +1 555-123-4567")
+        phones = NLPService._extract_phones("Phone: +1 212-555-0181")
         assert len(phones) >= 1
 
     def test_multiple_phones(self):
-        text = "Home: +1 555-111-2222, Work: +1 555-333-4444"
+        text = "Home: +1 212-555-0181, Work: +1 800-555-0100"
         phones = NLPService._extract_phones(text)
         assert len(phones) >= 2
 
@@ -137,7 +137,7 @@ class TestExtractPhones:
         assert phones == []
 
     def test_deduplication(self):
-        text = "+1 555-123-4567 and again +1 555-123-4567"
+        text = "+1 212-555-0181 and again +1 212-555-0181"
         phones = NLPService._extract_phones(text)
         assert len(phones) == 1
 
