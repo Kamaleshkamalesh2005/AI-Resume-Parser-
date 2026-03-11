@@ -12,7 +12,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_smorest import Api
 
-from config import Config
+from config import Config, ProductionConfig, config_by_name
 
 
 def create_app(config_class: Type[Config] = Config) -> Flask:
@@ -173,3 +173,15 @@ def _register_error_handlers(app: Flask) -> None:
             "message": "An unexpected error occurred. Please try again.",
             "errors": [str(error)]
         }), 500
+
+
+def _resolve_config_class() -> Type[Config]:
+    env = os.environ.get("FLASK_ENV", "development")
+    config_class = config_by_name.get(env, config_by_name["development"])
+    if env == "production":
+        ProductionConfig.validate_required()
+    return config_class
+
+
+# Gunicorn compatibility: supports both `gunicorn app:app` and `gunicorn run:app`.
+app = create_app(config_class=_resolve_config_class())
