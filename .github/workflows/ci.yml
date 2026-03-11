@@ -44,7 +44,7 @@ jobs:
       - name: Test (pytest)
         working-directory: backend
         run: |
-          pytest tests/ \
+          PYTHONPATH=$PWD:$PYTHONPATH python -m pytest tests/ \
             --cov=app \
             --cov-report=term-missing \
             -q
