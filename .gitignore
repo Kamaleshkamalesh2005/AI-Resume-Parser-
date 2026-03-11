@@ -82,6 +82,8 @@ env/
 uploads/
 logs/
 models/
+!backend/app/models/
+!backend/app/models/*.py
 *.pkl
 *.db
 *.sqlite
