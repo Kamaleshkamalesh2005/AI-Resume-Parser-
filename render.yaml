@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: ai-resume-parser-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -c gunicorn.conf.py run:app
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: UPLOAD_FOLDER
+        value: /tmp/uploads
+      - key: MODELS_FOLDER
+        value: /tmp/models
+    healthCheckPath: /api/v1/health

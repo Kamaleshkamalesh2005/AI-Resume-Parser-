@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://ai-resume-parser-backend.onrender.com/api/$1"
+    }
+  ]
+}
