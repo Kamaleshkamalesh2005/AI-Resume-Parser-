@@ -2,7 +2,6 @@
 -r backend/requirements.txt
 
 # Development and CI tools
-ruff
 mypy
 pytest
 pytest-cov

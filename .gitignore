@@ -100,9 +100,6 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Docker
-docker-compose.override.yml
-
 # Production
 build/
 dist/

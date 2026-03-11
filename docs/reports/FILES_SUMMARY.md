@@ -12,8 +12,6 @@
 - **GETTING_STARTED.md** - Step-by-step setup and troubleshooting guide
 - **docs/architecture/STRUCTURE.md** - Detailed folder structure and architecture explanation
 - **DEPLOYMENT.md** - Production deployment guide for various platforms
-- **Dockerfile** - Docker containerization for easy deployment
-- **docker-compose.yml** - Docker Compose for multi-service setup
 - **.env.example** - Environment variables template
 - **.gitignore** - Git ignore rules for Python projects
 
@@ -79,7 +77,7 @@
 | JavaScript Files | 2 |
 | Configuration Files | 5 |
 | Documentation Files | 5 |
-| Container Files | 2 |
+| Container Files | 0 |
 | **Total Files** | **43** |
 
 ---
@@ -130,8 +128,6 @@ MVC + Modular Blueprint Pattern
 - **Effects**: Glassmorphism, neon glows, smooth animations
 
 ### DevOps
-- **Containerization**: Docker
-- **Orchestration**: Docker Compose
 - **Language**: Python 3.8+
 
 ---
@@ -151,9 +147,6 @@ python train_models.py
 # Test API
 python test_api.py
 
-# Docker
-docker build -t resume-matcher .
-docker run -p 5000:5000 resume-matcher
 ```
 
 ---

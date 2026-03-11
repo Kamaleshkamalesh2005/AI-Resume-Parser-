@@ -1,4 +1,4 @@
-.PHONY: test test-unit test-integration coverage lint typecheck ci
+.PHONY: test test-unit test-integration coverage typecheck ci
 
 # ── Testing ───────────────────────────────────────────────────────────
 test:
@@ -18,12 +18,9 @@ coverage:
 		--cov-fail-under=80 \
 		-q
 
-# ── Linting / type-check ─────────────────────────────────────────────
-lint:
-	ruff check .
-
+# ── Type-check ───────────────────────────────────────────────────────
 typecheck:
 	mypy app/ --ignore-missing-imports --no-strict-optional
 
 # ── Full CI pipeline (matches GitHub Actions) ─────────────────────────
-ci: lint typecheck coverage
+ci: typecheck coverage

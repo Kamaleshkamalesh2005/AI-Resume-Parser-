@@ -39,8 +39,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* ── Footer ───────────────────────────────────────────── */}
       <footer className="border-t border-zinc-800 py-4 text-center text-xs text-zinc-500">
-        &copy; {new Date().getFullYear()} AI Resume Matcher &mdash; Built with
-        React + Flask
+        &copy; {new Date().getFullYear()} AI Resume Matcher &mdash; Build By Kamalesh B
       </footer>
     </div>
   );

@@ -305,8 +305,6 @@ C:\Users\kamal\Downloads\resume parser new\
 │   ├── src/
 │   ├── public/
 │   └── package.json
-├── docker-compose.yml
-├── Dockerfile
 ├── UNIVERSAL_PARSER.md           # This file
 ├── README.md
 └── .gitignore

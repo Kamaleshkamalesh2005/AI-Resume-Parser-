@@ -196,21 +196,6 @@ resume-matcher/
 │   │ venv/ (virtual environment)
 │   └── *.pyc
 │
-├── 📄 Dockerfile                    # Docker containerization
-│   ├── Python 3.11-slim base
-│   ├── Dependency installation
-│   ├── spaCy model download
-│   ├── Health check configuration
-│   └── Gunicorn startup command
-│
-├── 📄 docker-compose.yml            # Docker composition
-│   ├── Resume matcher service
-│   ├── Port mapping (5000)
-│   ├── Volume mounts
-│   ├── Environment variables
-│   ├── Health check
-│   └── Restart policy
-│
 ├── 📄 README.md                     # Comprehensive documentation
 │   ├── Features overview
 │   ├── Architecture explanation
