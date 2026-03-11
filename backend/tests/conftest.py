@@ -15,12 +15,21 @@ Fixtures:
 from __future__ import annotations
 
 import os
+import sys
 import textwrap
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 import numpy as np
 import pytest
+
+# ---------------------------------------------------------------------------
+# Ensure backend/ is on sys.path so `from app.*` imports always resolve,
+# regardless of how pytest is invoked (CI, IDE, command line).
+# ---------------------------------------------------------------------------
+_BACKEND_DIR = str(Path(__file__).resolve().parent.parent)
+if _BACKEND_DIR not in sys.path:
+    sys.path.insert(0, _BACKEND_DIR)
 
 # ---------------------------------------------------------------------------
 # Paths
